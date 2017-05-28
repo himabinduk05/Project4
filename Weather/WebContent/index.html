@@ -1,0 +1,163 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang = "en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Weather API</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type = "text/javascript">google.charts.load('current', {'packages':['corechart']});</script>
+</head>
+<body>
+  <nav class="navbar navbar-inverse" style="background-color:LightSkyBlue;color:white">
+  <div class="container-fluid">  
+        
+  
+    <center><h2 style="color:white">Weather Forecast<h2></center>
+    
+    
+    
+      </div>
+</nav>
+  <div class = "container-fluid" id = "header" style="width:900px; margin:0 auto;"> 
+   <ul class = "list-inline">     
+     <li><a class = "btn btn-warning" id = "FORECAST" onclick="return showfcm()"  href = "#" style = "color:purple;"> Forecast</a></li>
+     <li><a class = "btn btn-warning" id = "DSFORCAS" onclick="return showfca()"  href = "#" style = "color:purple;">Online Weather Api Forecast</a></li>
+   </ul>
+ </div>
+<div class="container">
+  <div class="jumbotron">
+  
+               
+        <div id="transbox4" style = "visibility:hidden;">
+	    <form method = "GET" action = "/WeatherForecast/bindu/forecast?date1=" id="weather" name="weather">
+		  <br>
+	      <div class = "input-group" id = "tb">
+	        <span class="input-group-addon" id="search1">
+             Date:
+			</span>
+            <input type = "date" name = "date1" id = "date1" class="form-control"/>
+			<span class="input-group-addon" id="search1">
+			  <button type="submit" id = "search1">
+			   <span class="glyphicon glyphicon-search"></span>
+			  </button> 
+			</span>
+		  </div>		  
+		</form>  
+      </div>
+      
+         <div id="transbox5" style = "visibility:hidden;">
+	    <form method = "get" action = "WeatherServlet?date2=" id="formfore" name="formfore">
+		  <br>
+	      <div class = "input-group" id = "tb1">
+	        <span class="input-group-addon" id="search2">
+             Date:
+			</span>
+            <input type = "datetime-local" name = "date2" id = "date2" class="form-control"/>
+			<span class="input-group-addon" id="search2">
+			  <button type="submit" id = "search2">
+			   <span class="glyphicon glyphicon-search"></span>
+			  </button> 
+			</span>
+		  </div>		  
+		</form>  
+      </div>
+       <div id="forecast1" style="color:#FFFFFF; width:'900px';height: '500px';">
+       </div>
+       <div id="forecast2" style="color:#FFFFFF; width:'900px';height: '500px';">
+       </div>
+ </div>
+</div>
+</div>
+ <div class = "container-fluid" id = "footer"> 
+ </div>
+ <script type="text/javascript">	   
+  
+   function showfcm(){
+	   var id = document.getElementById("transbox4");
+	   id.style.visibility = "visible"; 	  
+	   var id5 = document.getElementById("transbox5");
+	   id5.style.visibility = "hidden";
+	   return true;
+   }
+   function showfca(){
+	   var id = document.getElementById("transbox5");
+	   id.style.visibility = "visible";  
+	 
+	   var id4 = document.getElementById("transbox4");
+	   id4.style.visibility = "hidden";
+	  
+	   return true;
+   }
+   
+   $("#weather").submit(function() {
+	   
+	   var date = document.getElementById("date1").value;
+	   var lurl= $("#weather").attr("action");
+	   var lookurl=lurl+date;	   
+	   	   
+   $.ajax({
+     type: $("#weather").attr("method"),
+     dataType:"json",
+     url:lookurl,
+     
+     success: function (jsonData) {
+    	 var data = new google.visualization.DataTable();
+    	 
+         // assumes "word" is a string and "count" is a number
+         data.addColumn('string', 'DATE');
+         data.addColumn('number', 'TMAX');
+         data.addColumn('number', 'TMIN');
+         for (var i = 0; i < jsonData.length; i++) {
+             data.addRow([jsonData[i].DATE, jsonData[i].TMAX,jsonData[i].TMIN]);
+             //alert(jsonData[i].DATE +" "+jsonData[i].TMAX+" "+jsonData[i].TMIN);
+         }
+
+         var options = {
+             title: 'Forecast details',
+             is3D: true
+         };
+         var chart = new google.visualization.LineChart(document.getElementById('forecast1'));
+         chart.draw(data, options);
+     }
+   });
+   return false;
+   });
+   
+   
+   $("#formfore").submit(function () {
+   	   var date = document.getElementById("date2").value;
+   	   var temp = $("#formfore").attr("action");
+   	   var lookurl = temp+date;
+   $.ajax({
+     type: $("#formfore").attr("method"),
+     dataType:"json",
+     url: lookurl,
+     
+     success: function (jsonData) {   
+   	 
+    	 var data = new google.visualization.DataTable();         
+         data.addColumn('string', 'date');
+         data.addColumn('number', 'temperatureMax');
+         data.addColumn('number', 'temperatureMin');
+         for (var i = 0; i < jsonData.length; i++) {
+       	 
+             data.addRow([jsonData[i].date, jsonData[i].temperatureMax,jsonData[i].temperatureMin]);
+             //alert(jsonData[i].date +" "+jsonData[i].temperatureMax+" "+jsonData[i].temperatureMin);
+         }
+
+         var options = {
+             title: 'Online Forecast details',
+             is3D: true
+         };
+         var chart = new google.visualization.LineChart(document.getElementById('forecast2'));
+         chart.draw(data, options);
+     }
+   });
+   return false;
+   });
+ </script>
+</body>
+</html>
